@@ -10,11 +10,11 @@ public class Calculateur {
         }
 
         try {
-            double nombre1 = Double.parseDouble(args[0]);
-            double nombre2 = Double.parseDouble(args[1]);
+            int nombre1 = Integer.parseInt(args[0]);
+            int nombre2 = Integer.parseInt(args[1]);
             String operateur = args[2];
 
-            double resultat = calculer(nombre1, nombre2, operateur);
+            int resultat = calculer(nombre1, nombre2, operateur);
 
             System.out.println("Résultat : " + resultat);
         } catch (NumberFormatException e) {
@@ -24,7 +24,7 @@ public class Calculateur {
         }
     }
 
-    private static double calculer(double nombre1, double nombre2, String operateur) {
+    private static int calculer(int nombre1, int nombre2, String operateur) {
         switch (operateur) {
             case "+":
                 return nombre1 + nombre2;
