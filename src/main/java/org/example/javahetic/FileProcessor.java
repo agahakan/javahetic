@@ -36,8 +36,9 @@ public class FileProcessor {
             int num2 = Integer.parseInt(parts[1]);
             String operator = parts[2];
 
-            OperationStrategy strategy = OperationStrategyFactory.getStrategy(operator);
-            return (strategy != null) ? strategy.execute(num1, num2) : "ERROR";
+            return OperationStrategyFactory.getStrategy(operator)
+                    .map(strategy -> strategy.execute(num1, num2))
+                    .orElse("ERROR");
         } catch (NumberFormatException e) {
             return "ERROR";
         }
