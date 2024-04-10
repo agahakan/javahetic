@@ -7,6 +7,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.stream.Stream;
 
 public class FileOperationProcessor {
 
@@ -17,10 +18,11 @@ public class FileOperationProcessor {
         }
 
         Path dirPath = Paths.get(args[0]);
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dirPath, "*.op")) {
-            for (Path entry : stream) {
-                processFile(entry);
-            }
+
+        try (Stream<Path> paths = Files.walk(dirPath)) {
+            paths.filter(Files::isRegularFile)
+                    .filter(path -> path.toString().endsWith(".op"))
+                    .forEach(FileOperationProcessor::processFile);
         } catch (IOException e) {
             System.err.println("Error processing directory: " + e.getMessage());
         }
@@ -50,7 +52,7 @@ public class FileOperationProcessor {
 
         try {
             int num1 = Integer.parseInt(parts[0]);
-            int num2 =  Integer.parseInt(parts[1]);
+            int num2 = Integer.parseInt(parts[1]);
             String operator = parts[2];
             return switch (operator) {
                 case "+" -> String.valueOf(num1 + num2);
