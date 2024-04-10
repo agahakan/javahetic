@@ -52,12 +52,11 @@ public class FileOperationProcessor {
             int num1 = Integer.parseInt(parts[0]);
             int num2 =  Integer.parseInt(parts[1]);
             String operator = parts[2];
-            return switch (operator) {
-                case "+" -> String.valueOf(num1 + num2);
-                case "-" -> String.valueOf(num1 - num2);
-                case "*" -> String.valueOf(num1 * num2);
-                default -> "ERROR";
-            };
+            OperationStrategy strategy = OperationFactory.getOperation(operator);
+            if (strategy == null) {
+                return "ERROR";
+            }
+            return strategy.execute(num1, num2);
         } catch (NumberFormatException e) {
             return "ERROR";
         }
