@@ -4,8 +4,26 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.List;
 
 public class FileProcessor {
+
+    public void processOperations(DataReader dataReader) {
+        try {
+            List<String> operations = dataReader.readData();
+            Path outputPath = Path.of("./output.res");
+
+            try (BufferedWriter writer = Files.newBufferedWriter(outputPath)) {
+                for (String operation : operations) {
+                    String result = compute(operation);
+                    writer.write(result);
+                    writer.newLine();
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error processing operations: " + e.getMessage());
+        }
+    }
 
     public void processFile(Path filePath) {
         Path outputPath = Paths.get(filePath.toString().replaceAll("\\.op$", ".res"));
