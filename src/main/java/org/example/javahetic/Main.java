@@ -1,37 +1,34 @@
 package org.example.javahetic;
 
+import java.nio.file.Paths;
+
 public class Main {
 
     public static void main(String[] args) {
-        if (args.length < 1) {
-            showUsage();
-            return;
-        }
-
-        String dataSourceType = args[0].toUpperCase();
         ConfigLoader config = new ConfigLoader();
+        String implementationType = config.getProperty("implementation").toUpperCase();
 
-        switch (dataSourceType) {
-            case "JDBC":
-                String dbUrl = config.getProperty("db.url");
-                String username = config.getProperty("db.user");
-                String password = config.getProperty("db.password");
+        switch (implementationType) {
+            case "JDBC" -> {
+                String dbUrl = config.getProperty("database.url");
+                String username = config.getProperty("database.username");
+                String password = config.getProperty("database.password");
                 DataReader dataReader = new JdbcDataReader(dbUrl, username, password);
                 processOperations(dataReader);
-                break;
-            case "FILE":
-                if (args.length != 2) {
-                    System.out.println("File processing requires the directory path as an argument.");
+            }
+            case "FILE" -> {
+                String directoryPath = config.getProperty("file.path");
+                if (directoryPath == null || directoryPath.isEmpty()) {
+                    System.out.println("File processing requires the file path specified in application.properties.");
                     showUsage();
                     return;
                 }
-                String directoryPath = args[1];
-                dataReader = new FilesystemDataReader(directoryPath);
-                processOperations(dataReader);
-                break;
-            default:
-                showUsage();
-                break;
+                DataReader dataReader = new FilesystemDataReader(directoryPath);
+                FileProcessor fileProcessor = new FileProcessor();
+                fileProcessor.processDirectory(Paths.get(directoryPath));
+                fileProcessor.processOperations(dataReader);
+            }
+            default -> showUsage();
         }
     }
 
@@ -41,12 +38,9 @@ public class Main {
     }
 
     private static void showUsage() {
-        System.out.println("Incorrect usage. Please specify the data source type and relevant parameters:");
-        System.out.println("For file processing: java -cp <your_jar_or_class_directory> org.example.javahetic.Main FILE <directory_path>");
-        System.out.println("For JDBC: java -cp <your_jar_or_class_directory> org.example.javahetic.Main JDBC");
-        System.out.println("Example for FILE:");
-        System.out.println("java -cp target/classes org.example.javahetic.Main FILE /path/to/directory");
-        System.out.println("Example for JDBC:");
-        System.out.println("java -cp target/classes org.example.javahetic.Main JDBC");
+        System.out.println("Incorrect usage. Please check the implementation type and file path in application.properties:");
+        System.out.println("For FILE implementation, ensure file.path is set:");
+        System.out.println("implementation=FILE");
+        System.out.println("file.path=<path_to_directory>");
     }
 }

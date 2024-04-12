@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class FileProcessor {
 
@@ -12,6 +13,11 @@ public class FileProcessor {
         try {
             List<String> operations = dataReader.readData();
             Path outputPath = Path.of("./output.res");
+
+            if (operations.isEmpty()) {
+                System.err.println("No operations to process.");
+                return;
+            }
 
             try (BufferedWriter writer = Files.newBufferedWriter(outputPath)) {
                 for (String operation : operations) {
@@ -22,6 +28,16 @@ public class FileProcessor {
             }
         } catch (IOException e) {
             System.err.println("Error processing operations: " + e.getMessage());
+        }
+    }
+
+    public void processDirectory(Path directoryPath) {
+        try (Stream<Path> stream = Files.walk(directoryPath)) {
+            stream.filter(Files::isRegularFile)
+                    .filter(path -> path.toString().endsWith(".op"))
+                    .forEach(this::processFile);
+        } catch (IOException e) {
+            System.err.println("Error processing directory: " + e.getMessage());
         }
     }
 

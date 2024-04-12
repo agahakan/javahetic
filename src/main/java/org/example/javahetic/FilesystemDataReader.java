@@ -1,5 +1,6 @@
 package org.example.javahetic;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
@@ -14,6 +15,10 @@ public class FilesystemDataReader implements DataReader {
         this.directoryPath = Paths.get(directoryPath);
     }
 
+    public Path getDirectoryPath() {
+        return directoryPath;
+    }
+
     @Override
     public List<String> readData() throws IOException {
         List<String> operations = new ArrayList<>();
@@ -21,8 +26,14 @@ public class FilesystemDataReader implements DataReader {
             paths.filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(".op"))
                     .forEach(path -> {
-                        // Logic to read files and extract operations
-                        // Add extracted operations to the operations list
+                        try (BufferedReader reader = Files.newBufferedReader(path)) {
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                operations.add(line);
+                            }
+                        } catch (IOException e) {
+                            System.err.println("Failed to read file: " + path);
+                        }
                     });
         }
         return operations;
