@@ -30,6 +30,9 @@ public class JdbcDataReader implements DataReader {
                 }
             }
         } catch (SQLException e) {
+            System.err.println("SQL State: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            System.err.println("Message: " + e.getMessage());
             throw new IOException("Database access error", e);
         }
         return operations;
